@@ -1,0 +1,14 @@
+{
+    "name": "pxt-teenkit-color-sensor",
+    "version": "0.1",
+    "description": "Makecode pxt extension for TCS34725 color sensor.",
+    "dependencies": {
+        "core": "*"        
+    },
+    "files": [
+        "README.md",
+        "main.ts"
+    ],
+    "public": true,
+    "license": "MIT"
+}
