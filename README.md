@@ -1,4 +1,4 @@
-# TEENKIT颜色传感器
+# TCS34725 Driver For Microbit
 
 Makecode pxt extension for TCS34725 color sensor.
 
