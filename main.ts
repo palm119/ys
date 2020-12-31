@@ -4,19 +4,19 @@
  * 2020.12.29
  */
 
+enum RGB {
+    //% block="红"
+    RED,
+    //% block="绿"
+    GREEN,
+    //% block="蓝"
+    BLUE,
+    //% block="全部"
+    CLEAR
+}
+
 //% color=#3CB371 icon="\uf1b3" block="颜色传感器"
-namespace tcs34725 {
-    
-    export enum RGB {
-        //% block="红"
-        RED,
-        //% block="绿"
-        GREEN,
-        //% block="蓝"
-        BLUE,
-        //% block="全部"
-        CLEAR
-    }
+namespace TCS34725 {
 
     enum LCS_Constants {
         // Constants
@@ -36,23 +36,6 @@ namespace tcs34725 {
         AILTH = 0x05,
         AIHTL = 0x06, // Clear channel upper interrupt threshold
         AIHTH = 0x07,
-        PERS = 0x0C, // Persistence register - basic SW filtering mechanism for interrupts
-        PERS_NONE = 0x00, // Every RGBC cycle generates an interrupt
-        PERS_1_CYCLE = 0x01, // 1 clean channel value outside threshold range generates an interrupt
-        PERS_2_CYCLE = 0x02, // 2 clean channel values outside threshold range generates an interrupt
-        PERS_3_CYCLE = 0x03, // 3 clean channel values outside threshold range generates an interrupt
-        PERS_5_CYCLE = 0x04, // 5 clean channel values outside threshold range generates an interrupt
-        PERS_10_CYCLE = 0x05, // 10 clean channel values outside threshold range generates an interrupt
-        PERS_15_CYCLE = 0x06, // 15 clean channel values outside threshold range generates an interrupt
-        PERS_20_CYCLE = 0x07, // 20 clean channel values outside threshold range generates an interrupt
-        PERS_25_CYCLE = 0x08, // 25 clean channel values outside threshold range generates an interrupt
-        PERS_30_CYCLE = 0x09, // 30 clean channel values outside threshold range generates an interrupt
-        PERS_35_CYCLE = 0x0A, // 35 clean channel values outside threshold range generates an interrupt
-        PERS_40_CYCLE = 0x0B, // 40 clean channel values outside threshold range generates an interrupt
-        PERS_45_CYCLE = 0x0C, // 45 clean channel values outside threshold range generates an interrupt
-        PERS_50_CYCLE = 0x0D, // 50 clean channel values outside threshold range generates an interrupt
-        PERS_55_CYCLE = 0x0E, // 55 clean channel values outside threshold range generates an interrupt
-        PERS_60_CYCLE = 0x0F, // 60 clean channel values outside threshold range generates an interrupt
         CONFIG = 0x0D,
         CONFIG_WLONG = 0x02, // Choose between short and long (12x) wait times via WTIME
         CONTROL = 0x0F, // Set the gain level for the sensor
@@ -74,8 +57,6 @@ namespace tcs34725 {
         GAIN_16X = 0x02, // 16x gain
         GAIN_60X = 0x03  // 60x gain
     }
-
-    let LCS_integration_time_val = 0
 
     // I2C functions
 
@@ -99,7 +80,6 @@ namespace tcs34725 {
         buf.setNumber(NumberFormat.UInt8BE, 0, reg)
         pins.i2cWriteBuffer(addr, buf)
         buf = pins.i2cReadBuffer(addr, 2)
-        // Little endian
         return ((buf.getNumber(NumberFormat.UInt8BE, 1) << 8) | buf.getNumber(NumberFormat.UInt8BE, 0));
     }
 
@@ -118,7 +98,6 @@ namespace tcs34725 {
             val = 0
         }
         I2C_WriteReg8(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.ATIME), val)
-        LCS_integration_time_val = val
     }
 
     function LCS_set_gain(gain: number) {
@@ -139,7 +118,7 @@ namespace tcs34725 {
         }
 
         // Set default integration time and gain.
-        LCS_set_integration_time(0.0048)
+        LCS_set_integration_time(0.0024)
         LCS_set_gain(LCS_Constants.GAIN_4X)
 
         // Enable the device (by default, the device is in power down mode on bootup).
@@ -153,7 +132,6 @@ namespace tcs34725 {
     //% blockId="getSensorData" block="读取颜色RGB值 %color"
     //% weight=99 
     export function getColorData(color: RGB): number {
-        basic.pause((256 - LCS_integration_time_val) * 2.4);
         let sum = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.CDATAL));
         let vue = 0;
         switch (color) {
@@ -170,10 +148,14 @@ namespace tcs34725 {
                 break;
 
             case RGB.CLEAR:
+                /* Set a delay for the integration time */
+                basic.pause(24);
                 return sum;
-                break;
-
         }
+
+        /* Set a delay for the integration time */
+        basic.pause(24);
+
         vue = Math.floor(vue / sum * 255);
 //        serial.writeLine("val: " + vue);
         return vue;
@@ -185,12 +167,14 @@ namespace tcs34725 {
     //% blockId="getColor" block="读取到的主颜色"
     //% weight=97 
     export function getColor(): RGB {
-        basic.pause((256 - LCS_integration_time_val) * 2.4);
         let r = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.RDATAL));
         let g =  I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.GDATAL));
         let b = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.BDATAL));
 //        serial.writeLine("R:"+r + " G:" + g + " B:" + b);
          
+        /* Set a delay for the integration time */
+        basic.pause(24);
+
         let color = RGB.RED;
         let max = Math.max(r, Math.max(g, b));
         if (max == g) {
