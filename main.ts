@@ -107,7 +107,6 @@ namespace tcs34725 {
         // Set the power and enable bits.
         I2C_WriteReg8(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.ENABLE), LCS_Constants.ENABLE_PON)
         basic.pause(10) // not sure if this is right    time.sleep(0.01) // FIXME delay for 10ms
-
         I2C_WriteReg8(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.ENABLE), (LCS_Constants.ENABLE_PON | LCS_Constants.ENABLE_AEN))
     }
 
@@ -141,7 +140,7 @@ namespace tcs34725 {
 
         // Set default integration time and gain.
         LCS_set_integration_time(0.0048)
-        LCS_set_gain(LCS_Constants.GAIN_16X)
+        LCS_set_gain(LCS_Constants.GAIN_4X)
 
         // Enable the device (by default, the device is in power down mode on bootup).
         LCS_enable()
@@ -176,7 +175,7 @@ namespace tcs34725 {
 
         }
         vue = Math.floor(vue / sum * 255);
-        serial.writeLine("val: " + vue);
+//        serial.writeLine("val: " + vue);
         return vue;
     }
 
@@ -190,7 +189,7 @@ namespace tcs34725 {
         let r = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.RDATAL));
         let g =  I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.GDATAL));
         let b = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.BDATAL));
-        serial.writeLine("R:"+r + " G:" + g + " B:" + b);
+//        serial.writeLine("R:"+r + " G:" + g + " B:" + b);
          
         let color = RGB.RED;
         let max = Math.max(r, Math.max(g, b));
@@ -201,7 +200,7 @@ namespace tcs34725 {
             color = RGB.BLUE;
         }
 
-        serial.writeLine("val: " + color);
+//        serial.writeLine("val: " + color);
         return color;
     }
 
