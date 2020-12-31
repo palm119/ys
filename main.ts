@@ -133,32 +133,49 @@ namespace TCS34725 {
     //% weight=99 
     export function getColorData(color: RGB): number {
         let sum = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.CDATAL));
-        let vue = 0;
-        switch (color) {
-            case RGB.RED:
-                vue = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.RDATAL));
-                break;
-
-            case RGB.GREEN:
-                vue = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.GDATAL));
-                break;
-
-            case RGB.BLUE:
-                vue = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.BDATAL));
-                break;
-
-            case RGB.CLEAR:
-                /* Set a delay for the integration time */
-                basic.pause(24);
-                return sum;
-        }
+        let red = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.RDATAL));
+        let green = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.GDATAL));
+        let blue = I2C_ReadReg16(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.BDATAL));
 
         /* Set a delay for the integration time */
         basic.pause(24);
 
-        vue = Math.floor(vue / sum * 255);
-//        serial.writeLine("val: " + vue);
-        return vue;
+        red = Math.round(red / sum * 255);
+        green = Math.round(green / sum * 255);
+        blue = Math.round(blue / sum * 255);
+
+        if (red > green*2 && red > blue*2) {
+            red = 255;
+            green = Math.round(green/2);
+            blue = Math.round(blue/2);
+        }
+        else if (green > red*2 && green > blue*2) {
+            green = 255;
+            red = Math.round(red/2);
+            blue = Math.round(blue/2);
+        }
+        else if (blue > red*2 && blue > green*2) {
+            blue = 255;
+            red = Math.round(red/2);
+            green = Math.round(green/2);
+        }
+        
+        switch (color) {
+            case RGB.RED:
+                return red;
+                break;
+
+            case RGB.GREEN:
+                return green;
+               break;
+
+            case RGB.BLUE:
+                return blue;
+                break;
+
+            case RGB.CLEAR:
+                return sum;
+        }
     }
 
     /**
