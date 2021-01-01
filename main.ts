@@ -110,19 +110,31 @@ namespace TCS34725 {
     //% blockId="initialize_sensor" block="初始化传感器"
     //% weight=100 
     export function LCS_initialize() {
-        // Make sure we're connected to the right sensor.
-        let chip_id = I2C_ReadReg8(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.ID))
-
-        if (chip_id != 0x44) {
-            return // Incorrect chip ID
-        }
+        let iic_address = LCS_Constants.ADDRESS
+        pins.i2cWriteNumber(iic_address, 0x80 | 0x12, NumberFormat.Int8LE, false)
+        pins.i2cWriteNumber(iic_address, 0x80 | 0x00, NumberFormat.Int8LE, true)
+        pins.i2cWriteNumber(iic_address, 1, NumberFormat.Int8LE, false)
+        basic.pause(10)
+        pins.i2cWriteNumber(iic_address, 0x80 | 0x00, NumberFormat.Int8LE, true)
+        pins.i2cWriteNumber(iic_address, 3, NumberFormat.Int8LE, false)
 
         // Set default integration time and gain.
         LCS_set_integration_time(0.0024)
         LCS_set_gain(LCS_Constants.GAIN_4X)
 
-        // Enable the device (by default, the device is in power down mode on bootup).
-        LCS_enable()
+        // // Make sure we're connected to the right sensor.
+        // let chip_id = I2C_ReadReg8(LCS_Constants.ADDRESS, (LCS_Constants.COMMAND_BIT | LCS_Constants.ID))
+
+        // if (chip_id != 0x44) {
+        //     return // Incorrect chip ID
+        // }
+
+        // // Set default integration time and gain.
+        // LCS_set_integration_time(0.0024)
+        // LCS_set_gain(LCS_Constants.GAIN_4X)
+
+        // // Enable the device (by default, the device is in power down mode on bootup).
+        // LCS_enable()
     }
 
     /**
