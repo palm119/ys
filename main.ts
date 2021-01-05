@@ -156,17 +156,17 @@ namespace TCS34725 {
         green = Math.round(green / sum * 255);
         blue = Math.round(blue / sum * 255);
 
-        if (red > green*2 && red > blue*2) {
+        if (red > 128 && red > green*2 && red > blue*2) {
             red = 255;
             green = Math.round(green/2);
             blue = Math.round(blue/2);
         }
-        else if (green > red*2 && green > blue*2) {
+        if (green > 128 && green > red*2 && green > blue*2) {
             green = 255;
             red = Math.round(red/2);
             blue = Math.round(blue/2);
         }
-        else if (blue > red*2 && blue > green*2) {
+        if (blue > 128 && blue > red*2 && blue > green*2) {
             blue = 255;
             red = Math.round(red/2);
             green = Math.round(green/2);
